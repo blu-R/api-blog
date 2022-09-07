@@ -2,8 +2,12 @@ const userControllers = require("./users.controllers");
 const postControllers = require("../posts/posts.controllers");
 
 const getAll = (req, res) => {
-    const data = userControllers.getAllUsers();
-    res.status(200).json({ items: data.length, users: data });
+    userControllers
+        .getAllUsers()
+        .then(response => {
+            res.status(200).json({ items: response.length, users: response });
+        })
+        .catch(err => res.status(400).json({ err }));
 };
 
 const getById = (req, res) => {
@@ -41,11 +45,15 @@ const register = (req, res) => {
             },
         });
     } else {
-        const data = userControllers.createUser(user);
-        return res.status(201).json({
-            message: `User created succesfully with id: ${data.id}`,
-            user: data,
-        });
+        userControllers
+            .createUser(user)
+            .then(response => {
+                return res.status(201).json({
+                    message: `User created succesfully with id: ${response.id}`,
+                    user: response,
+                });
+            })
+            .catch(err => res.status(400).json({ err }));
     }
 };
 
@@ -91,10 +99,13 @@ const edit = (req, res) => {
 
 const remove = (req, res) => {
     const id = req.params.id;
-    const data = userControllers.deleteUser(id);
-    return data
-        ? res.status(204).json() //? 204 no permite retornar algo, el json nos permite indicar que alli termina la respuesta.
-        : res.status(400).json({ message: "Invalid Id" });
+    userControllers.deleteUser(id).then(response => {
+        if (response) {
+            res.status(204).json(); //? 204 no permite retornar algo, el json nos permite indicar que alli termina la respuesta.
+        } else {
+            res.status(400).json({ message: "Invalid Id" });
+        }
+    });
 };
 
 const getMyUser = (req, res) => {

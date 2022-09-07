@@ -17,9 +17,14 @@ const { db } = require("./utils/database.util"); //? Sequelize
 const app = express();
 app.use(express.json()); //? Esta configuración es para habilitar el req.body
 
+//* Authenticate database credentials
 db.authenticate()
     .then(() => console.log("Database Authenticated"))
-    .catch(err => console.log(err)); //? Sequelize
+    .catch(err => console.log(err));
+
+db.sync()
+    .then(() => console.log("Database synced succesfully!."))
+    .catch(err => console.log(err));
 
 //* Rutas
 

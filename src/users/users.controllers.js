@@ -1,6 +1,8 @@
 const uuid = require("uuid");
 const { hashPassword } = require("../utils/crypt");
 
+const Users = require("../models/user.model");
+
 const usersDB = [
     {
         id: "774495ba-483b-49c4-b17c-a0a1bfa3796f",
@@ -35,7 +37,8 @@ const usersDB = [
 ];
 
 const getAllUsers = () => {
-    return usersDB;
+    const data = Users.findAll();
+    return data;
     //? select * from users;
 };
 
@@ -45,22 +48,22 @@ const getUserById = id => {
     //? select * from users where id = ${id};
 };
 
-const createUser = data => {
-    const newUser = {
-        id: uuid.v4(), // obligatorio y único
-        first_name: data.first_name, // obligatorio
-        last_name: data.last_name, // obligatorio
-        email: data.email, //obligatorio y único
-        password: hashPassword(data.password), // obligatorio
-        phone: data.phone ? data.phone : "", // único
-        birthday_date: data.birthday_date, // obligatorio
-        rol: "normal", // obligatorio y por defecto "normal"
-        profile_image: data.profile_image ? data.profile_image : "",
-        country: data.country, // obligatorio
-        is_active: true, // obligatorio y por defecto true
-        verified: false, //obligatorio y por defecto false
-    };
-    usersDB.push(newUser);
+const createUser = async data => {
+    const newUser = await Users.create({
+        id: uuid.v4(),
+        password: hashPassword(data.password),
+        rol: "normal",
+        is_active: true,
+        verified: false,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        birthday_date: data.birthday_date,
+        country: data.country,
+        phone: data.phone ? data.phone : null,
+        profile_image: data.profile_image ? data.profile_image : null,
+    });
+
     return newUser;
 };
 
@@ -87,14 +90,13 @@ const editUser = (id, data) => {
     }
 };
 
-const deleteUser = id => {
-    const index = usersDB.findIndex(user => user.id === id);
-    if (index !== -1) {
-        usersDB.splice(index, 1);
-        return true;
-    } else {
-        return false;
-    }
+const deleteUser = async id => {
+    const data = await Users.destroy({
+        where: {
+            id,
+        },
+    });
+    return data;
 };
 
 const getUserByEmail = email => {

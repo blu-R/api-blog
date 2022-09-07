@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const db = new Sequelize({
     dialect: "postgres",
@@ -11,4 +11,5 @@ const db = new Sequelize({
 
 module.exports = {
     db,
+    DataTypes,
 };
